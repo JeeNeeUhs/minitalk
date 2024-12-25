@@ -1,6 +1,17 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   server.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ahekinci <ahekinci@student.42kocaeli.co    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/12/25 16:10:32 by ahekinci          #+#    #+#             */
+/*   Updated: 2024/12/25 16:52:20 by ahekinci         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include <signal.h>
 #include <unistd.h>
-#include <stdio.h>
 
 static void	handle_signal(int sig, siginfo_t *info, void *context)
 {
@@ -16,11 +27,33 @@ static void	handle_signal(int sig, siginfo_t *info, void *context)
 	if (pos == 8)
 	{
 		write(1, &b_buf, 1);
-		if (b_buf == '\0')
-			kill(info->si_pid, SIGUSR1);
 		b_buf = 0;
 		pos = 0;
 	}
+	kill(info->si_pid, SIGUSR2);
+}
+
+void	ft_putchar(char c)
+{
+	write(1, &c, 1);
+}
+
+void	ft_putnbr(int n)
+{
+	if (n == -2147483648)
+		write(1, "-2147483648", 11);
+	else if (n < 0)
+	{
+		ft_putchar('-');
+		ft_putnbr(-n);
+	}
+	else if (n > 9)
+	{
+		ft_putnbr(n / 10);
+		ft_putnbr(n % 10);
+	}
+	else
+		ft_putchar('0' + n);
 }
 
 int	main(void)
@@ -34,7 +67,10 @@ int	main(void)
 		return (1);
 	if (sigaction(SIGUSR2, &sa, NULL) == -1)
 		return (1);
-	printf("Process PID: %d\n", getpid());
+	write(1, "Process PID: ", 13);
+	ft_putnbr(getpid());
+	write(1, "\n", 1);
 	while (1)
 		pause();
+	return (0);
 }

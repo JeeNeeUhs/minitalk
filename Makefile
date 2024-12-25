@@ -33,7 +33,7 @@ $(SERVER): $(SERVER_SRC)
 $(NAME): $(CLIENT) $(SERVER)
 
 clean:
-	$(RM) $(CLIENT) $(SERVER)
+	$(RM) $(CLIENT) $(SERVER) $(CLIENT_BONUS) $(SERVER_BONUS)
 
 fclean: clean
 

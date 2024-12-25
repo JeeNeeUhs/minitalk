@@ -1,5 +1,19 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   client.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ahekinci <ahekinci@student.42kocaeli.co    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/12/25 16:10:30 by ahekinci          #+#    #+#             */
+/*   Updated: 2024/12/25 16:49:26 by ahekinci         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include <signal.h>
 #include <unistd.h>
+
+int	g_check = 0;
 
 static int	ft_atoi(char *str)
 {
@@ -32,15 +46,17 @@ static int	send_char(int pid, char c)
 			if (kill(pid, SIGUSR1) == -1)
 				return (-1);
 		}
-		usleep(250);
+		while (!g_check)
+			;
+		g_check = 0;
 	}
 	return (0);
 }
 
 static void	handle_signal(int sig)
 {
-	if (sig == SIGUSR1)
-		write(1, "Signal received.", 16);
+	(void)sig;
+	g_check = 1;
 }
 
 int	main(int argc, char **argv)
@@ -51,7 +67,7 @@ int	main(int argc, char **argv)
 	sa.sa_handler = handle_signal;
 	sigemptyset(&sa.sa_mask);
 	sa.sa_flags = 0;
-	if (sigaction(SIGUSR1, &sa, NULL) == -1)
+	if (sigaction(SIGUSR2, &sa, NULL) == -1)
 		return (1);
 	if (argc != 3)
 		return (1);
@@ -65,5 +81,4 @@ int	main(int argc, char **argv)
 		return (1);
 	if (send_char(pid, '\0') == -1)
 		return (1);
-	usleep(1000);
 }
